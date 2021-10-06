@@ -18,6 +18,7 @@ int main()
 
     // Setting Matrix(Column Major)
     /************************************Method1****************************************/
+    /**************************サンプルファイルから読み込む*******************************/
     // string filename("sample/sample1.txt");
     // double number;
 
@@ -47,8 +48,8 @@ int main()
         return -1;
     }
 
-    /**********************************Method
-     * 2****************************************/
+    /**********************************Method2****************************************/
+    /******************乱数を使用して実対称行列を作成する。******************************/
     make_mat(n, A);
     printf("A = \n");
     // printmat(n, A);
@@ -56,10 +57,10 @@ int main()
     fprintf(file, "A = \n");
     fprintmat(file, n, A);
     fprintf(file, "\n");
-
+    /**************************Lanczos法使用&lapackで対角化***************************/
     calc_ab(file, n, A, eigen_value);
 
-    /********************solve by lapacke*****************/
+    /********************行列そのものをlapackeに投げる。*****************/
     LAPACKE_dsyev(LAPACK_ROW_MAJOR, 'N', 'U', n, A, n, lw);
     printf("LAPACKE's ANSWER\n");
     printf("eigen value = \n");
