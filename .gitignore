@@ -1,0 +1,8 @@
+.vscode
+*.o
+outpit2_lapack.txt
+output1.txt
+output2.txt
+output3_lapack.txt
+output3.txt
+program
