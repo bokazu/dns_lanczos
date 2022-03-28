@@ -1,0 +1,11 @@
+{
+    "files.associations": {
+        "deque": "cpp",
+        "string": "cpp",
+        "vector": "cpp",
+        "array": "cpp",
+        "string_view": "cpp",
+        "cassert": "cpp"
+    },
+    "C_Cpp.errorSquiggles": "Disabled"
+}
