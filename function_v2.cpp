@@ -5,7 +5,7 @@ using namespace std;
 lapack_int LAPACKE_dstev(int matrix_order, char jobz, lapack_int n, double *d,
                          double *e, double *z, lapack_int ldz);
 
-void calc_ab(FILE *file, int n, double *A, double *eigen_value)
+void calc_ab(ofstream &file, int n, double *A, double *eigen_value)
 {
     cout << "start function_v2\n";
     // setting Initial vector & standarbilization
@@ -146,13 +146,19 @@ void calc_ab(FILE *file, int n, double *A, double *eigen_value)
         cblas_dcopy(n, eigenv_even, 1, eigen_value, 1);
     printf("eigen value = \n");
     printvec(n, eigen_value);
-    fprintf(file, "\n");
-    fprintf(file, "\n");
-    fprintf(file, "count = \n");
-    fprintf(file, "%d\n", count);
-    fprintf(file, "\n");
-    fprintf(file, "\n");
-    fprintf(file, "eigen value = \n");
+    // fprintf(file, "\n");
+    // fprintf(file, "\n");
+    file << "count = " << endl;
+    // fprintf(file, "count = \n");
+    file << count << endl;
+    // fprintf(file, "%d\n", count);
+    file << endl;
+    // fprintf(file, "\n");
+    file << endl;
+    // fprintf(file, "\n");
+    file << "eigen value = " << endl;
+    // fprintf(file, "eigen value = \n");
+
     fprintvec(file, n, eigen_value);
 
     cout << "end\n";
@@ -160,6 +166,8 @@ void calc_ab(FILE *file, int n, double *A, double *eigen_value)
     {
         delete u[i];
     }
+
+    file.close();
     delete[] u;
     delete[] v;
     delete[] alpha;

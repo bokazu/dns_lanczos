@@ -27,6 +27,7 @@ int main()
     }
     set_matsize >> n;
     cout << n << endl;
+    set_matsize.close();
 
     double *A = new double[n * n];
     double *eigen_value = new double[n];
@@ -58,4 +59,39 @@ int main()
             cout << "Output file name :" << OutputFile_name << endl;
         }
     }
+    set_file.close();
+
+    /*Hamiltonianの行列要素の情報の取得(密行列形式)*/
+    int dim2 = 0;
+    int num = 0;
+    double number;
+    ifstream sample_file(SampleFile_name);
+    while (sample_file >> number)
+    {
+        A[num] = number;
+        num++;
+    }
+    sample_file.close();
+    printmat(n, A);
+
+    ofstream output(OutputFile_name);
+    fprintmat(output, n, A);
+
+    /*Lanczos法とLAPACKで対角化*/
+    calc_ab(output, n, A, eigen_value);
+
+    /*行列そのものをLAPACKに投げる*/
+    LAPACKE_dsyev(LAPACK_COL_MAJOR, 'N', 'U', n, A, n, lw);
+    printf("LAPACKE's ANSWER\n");
+    printf("eigen value = \n");
+    printvec(n, lw);
+
+    // fprintf(OutputFile_name, "LAPACKE's ANSWER\n");
+
+    // fprintf(OutputFile_name, "eigen value = \n");
+    fprintvec(output, n, lw);
+    /*メモリの開放*/
+    delete[] A;
+    delete[] eigen_value;
+    delete[] lw;
 }

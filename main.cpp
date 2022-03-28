@@ -59,7 +59,6 @@ int main()
     }
 
     double number;
-
     ifstream sample_file(sample_filename);
     if (!sample_file.is_open())
     {
@@ -67,6 +66,7 @@ int main()
         return EXIT_FAILURE;
     }
 
+    /*Hamiltonianの行列要素の情報の取得(密行列形式)*/
     int dim2 = 0;
     int num = 0;
     while (sample_file >> number)
@@ -81,6 +81,8 @@ int main()
         cerr << "Could not open the file - '" << sample_filename << "'" << endl;
         return EXIT_FAILURE;
     }
+
+    ofstream file(output_filename);
 
     /**********************************Method2****************************************/
     /******************乱数を使用して実対称行列を作成する。******************************/
