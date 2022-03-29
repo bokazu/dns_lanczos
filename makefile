@@ -1,10 +1,10 @@
 gcc_options = -std=c++17 -Wall --pedantic-errors
 l_b = -llapacke -lblas
 
-program : main_v2.o printmat.o function_v2.o gso.o
+program : main.o printmat.o function_v2.o gso.o
 	g++ -o $@ $^ $(l_b)
 
-main_v2.o : main_v2.cpp
+main.o : main.cpp
 	g++ -c $< $(l_b)
 
 printmat.o : printmat.cpp

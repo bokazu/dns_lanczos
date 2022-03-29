@@ -12,102 +12,86 @@ lapack_int LAPACKE_dstev(int matrix_order, char jobz, lapack_int n, double *d,
 int main()
 {
     int n;
+
+    /********************************サンプルファイルから読み込み*************************************/
+    string matsize_file = "set_matrixsize.txt";
+    string filename = "set_filename.txt";
+
+    /**********************************行列サイズの取得**********************************/
+    ifstream set_matsize(matsize_file);
+    if (!(set_matsize))
+    {
+        cerr << "Could not open the file(line 31) - '" << matsize_file << "'"
+             << endl;
+        return EXIT_FAILURE;
+    }
+    set_matsize >> n;
+    cout << n << endl;
+    set_matsize.close();
+
     double *A = new double[n * n];
     double *eigen_value = new double[n];
     double *lw = new double[n];
 
-    // Setting Matrix(Column Major)
-    /************************************Method1****************************************/
-    /**************************サンプルファイルから読み込む*******************************/
-    string set_matsize_file = "set_matrixsize.txt";
-    string set_filename = "set_filename.txt";
-
-    ifstream set_matsize(set_matsize_file);
-    ifstream set_file(set_filename);
-
-    string sample_filename;
-    string output_filename;
-    ofstream output_file(output_filename);
-    // ifstream setting_file(setting_filename);
-    if (!(set_matsize))
-    {
-        cerr << "Could not open the file(line 31) - '" << set_matsize_file
-             << "'" << endl;
-        return EXIT_FAILURE;
-    }
-    set_matsize >> n;
+    /**************************************ファイル名の取得***************************************/
+    ifstream set_file(filename);
     if (!(set_file))
     {
-        cerr << "Could not open the file(line 31) - '" << set_filename << "'"
+        cerr << "Could not open the file(line 31) - '" << filename << "'"
              << endl;
         return EXIT_FAILURE;
     }
-    int count = 0;
+    int file_line_count = 0;
+    string filename_tmp;
+    string SampleFile_name, OutputFile_name;
     while (!set_file.eof())
     {
-        string tmp;
-        getline(set_filename, tmp);
-        if (count == 0)
+        getline(set_file, filename_tmp);
+        if (file_line_count == 0)
         {
-            sample_filename = tmp;
+            SampleFile_name = filename_tmp;
+            cout << "Sample file name :" << SampleFile_name << endl;
+            file_line_count += 1;
         }
         else
         {
-            output_filename = tmp;
+            OutputFile_name = filename_tmp;
+            cout << "Output file name :" << OutputFile_name << endl;
         }
-        count++;
     }
-
-    double number;
-    ifstream sample_file(sample_filename);
-    if (!sample_file.is_open())
-    {
-        cerr << "Could not open the file - '" << sample_filename << "'" << endl;
-        return EXIT_FAILURE;
-    }
+    set_file.close();
 
     /*Hamiltonianの行列要素の情報の取得(密行列形式)*/
     int dim2 = 0;
     int num = 0;
+    double number;
+    ifstream sample_file(SampleFile_name);
     while (sample_file >> number)
     {
         A[num] = number;
         num++;
     }
     sample_file.close();
+    printmat(n, A);
 
-    if (!output_file)
-    {
-        cerr << "Could not open the file - '" << sample_filename << "'" << endl;
-        return EXIT_FAILURE;
-    }
+    ofstream output(OutputFile_name);
+    fprintmat(output, n, A);
 
-    ofstream file(output_filename);
+    /*Lanczos法とLAPACKで対角化*/
+    calc_ab(output, n, A, eigen_value);
 
-    /**********************************Method2****************************************/
-    /******************乱数を使用して実対称行列を作成する。******************************/
-    // make_mat(n, A);
-    // printf("A = \n");
-    // // printmat(n, A);
-    // // printf("\n");
-    // fprintf(file, "A = \n");
-    // fprintmat(file, n, A);
-    // fprintf(file, "\n");
-    /**************************Lanczos法使用&lapackで対角化***************************/
-    calc_ab(file, n, A, eigen_value);
+    /*行列そのものをLAPACKに投げる*/
+    LAPACKE_dsyev(LAPACK_COL_MAJOR, 'N', 'U', n, A, n, lw);
+    printf("LAPACKE's ANSWER\n");
+    printf("eigen value = \n");
+    printvec(n, lw);
 
-    /********************行列そのものをlapackeに投げる。*****************/
-    // LAPACKE_dsyev(LAPACK_COL_MAJOR, 'N', 'U', n, A, n, lw);
-    // printf("LAPACKE's ANSWER\n");
-    // printf("eigen value = \n");
-    // printvec(n, lw);
+    // fprintf(OutputFile_name, "LAPACKE's ANSWER\n");
 
-    // fprintf(file, "LAPACKE's ANSWER\n");
-    // fprintf(file, "eigen value = \n");
-    // fprintvec(file, n, lw);
-
+    // fprintf(OutputFile_name, "eigen value = \n");
+    fprintvec(output, n, lw);
+    /*メモリの開放*/
     delete[] A;
     delete[] eigen_value;
     delete[] lw;
-    fclose(file);
 }
