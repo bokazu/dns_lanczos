@@ -17,26 +17,44 @@ void calc_ab(ofstream &file, int n, double *A, double *eigen_value)
     srand(time(NULL));
     for (int i = 0; i < n; i++)
     {
+        for (int j = i; j < n; j++)
+        {
+            u[i][j] = 0.0;
+            u[j][i] = 0.0;
+        }
+    }
+
+    for (int i = 0; i < n; i++)
+    {
         u[0][i] = (double)rand() / RAND_MAX;
     }
     sdz(n, u[0]);
 
     double *v = new double[n];
+    vec_init(n, v);
     double *alpha =
         new double[n];  // Insert diagonal elements of tridiagonal matrix
+    vec_init(n, alpha);
     double *beta =
         new double[n];  // Insert subdiagonal elements of tridiagonal matrix
+    vec_init(n, beta);
     // Insert eigenvalue when k == even & odd
     double *eigenv_even = new double[n];
+    vec_init(n, eigenv_even);
     double *eigenv_odd = new double[n];
+    vec_init(n, eigenv_odd);
     // Insert eigenvector when k == even & odd
     double *eigenvec_even = new double[n];
+    vec_init(n, eigenvec_even);
     double *eigenvec_odd = new double[n];
+    vec_init(n, eigenvec_odd);
     // Use as lapack argument. d = alpha, e = beta
     double *d = new double[n];
+    vec_init(n, d);
     double *e = new double[n];
+    vec_init(n, e);
 
-    double beta_pow2 = 0;
+    double beta_pow2 = 0.;
     double eps = 1.0;
     int check = 1;  //"1" means eps > 1.0e-16. "0" means eps < 1.0e-16
     bool checker = true;
@@ -125,17 +143,17 @@ void calc_ab(ofstream &file, int n, double *A, double *eigen_value)
                 {
                     checker = true;
                 }
-                else if (eps < 1.0e-16)
+                else if (eps < 1.0e-15)
                 {
                     checker = false;
-                    cout << "break at count = " << k << endl;
+                    // cout << "break at count = " << k << endl;
                 }
             }
-            cout << "count = " << k << endl;
+            // cout << "count = " << k << endl;
         }
         else
         {
-            cout << "break at" << k << endl;
+            // cout << "break at" << k << endl;
             break;
         }
         count++;
@@ -144,7 +162,7 @@ void calc_ab(ofstream &file, int n, double *A, double *eigen_value)
         cblas_dcopy(n, eigenv_odd, 1, eigen_value, 1);
     else
         cblas_dcopy(n, eigenv_even, 1, eigen_value, 1);
-    printf("eigen value = \n");
+    // printf("my eigen value = \n");
     printvec(n, eigen_value);
     // fprintf(file, "\n");
     // fprintf(file, "\n");
@@ -159,7 +177,7 @@ void calc_ab(ofstream &file, int n, double *A, double *eigen_value)
     file << "eigen value = " << endl;
     // fprintf(file, "eigen value = \n");
 
-    fprintvec(file, n, eigen_value);
+    fprintvec_col(file, n, eigen_value);
 
     cout << "end\n";
     for (int i = 0; i < n; i++)
@@ -167,7 +185,6 @@ void calc_ab(ofstream &file, int n, double *A, double *eigen_value)
         delete u[i];
     }
 
-    file.close();
     delete[] u;
     delete[] v;
     delete[] alpha;

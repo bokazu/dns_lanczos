@@ -71,10 +71,13 @@ void printmat(int n, double* A);
 void fprintmat(std::ofstream& file, int n, double* A);
 void printvec(int n, double* B);
 void fprintvec(std::ofstream& file, int n, double* B);
+void fprintvec_col(std::ofstream& file, int n, double* B);
 void print2dvec(int n, double** C);
 void fprint2dvec(std::ofstream& file, int n, double** C);
 void calc_ab(std::ofstream& file, int n, double* A, double* eigenv);
 void gso(int n, int k, double** u);
 void sdz(int n, double* v);
+void vec_init(int n, double* vec);
+void vec_init(int n, int* vec);
 void make_mat(int n, double* A);
 #endif

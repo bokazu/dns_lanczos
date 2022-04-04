@@ -5,7 +5,8 @@
         "vector": "cpp",
         "array": "cpp",
         "string_view": "cpp",
-        "cassert": "cpp"
+        "cassert": "cpp",
+        "iostream": "cpp"
     },
     "C_Cpp.errorSquiggles": "Enabled"
 }

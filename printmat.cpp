@@ -109,6 +109,27 @@ void fprintvec(ofstream &file, int n, double *B)
     // fprintf(file, "]\n");
 }
 
+/*ベクトルを列ベクトル表示する*/
+void fprintvec_col(ofstream &file, int n, double *B)
+{
+    // ofstream file(OutputFile_name, ios::app);
+    double vtmp;
+    // fprintf(file, "[");
+    for (int col_num = 0; col_num < n; col_num++)
+    {
+        vtmp = B[col_num];
+        file << setw(17) << setprecision(15) << setw(5) << vtmp << endl;
+        // fprintf(file, "%5.8e", vtmp);
+        if (col_num < n - 1)
+        {
+            file << "  ";
+            // fprintf(file, ",");
+        }
+    }
+    file << "\n" << endl;
+    // fprintf(file, "]\n");
+}
+
 void print2dvec(int n, double **C)
 {
     double vtmp;

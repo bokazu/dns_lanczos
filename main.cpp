@@ -14,8 +14,8 @@ int main()
     int n;
 
     /********************************サンプルファイルから読み込み*************************************/
-    string matsize_file = "set_matrixsize.txt";
-    string filename = "set_filename.txt";
+    string matsize_file = "set_model/set_matrixsize.txt";
+    string filename = "set_model/set_filename.txt";
 
     /**********************************行列サイズの取得**********************************/
     ifstream set_matsize(matsize_file);
@@ -33,6 +33,10 @@ int main()
     double *eigen_value = new double[n];
     double *lw = new double[n];
 
+    vec_init(n * n, A);
+    vec_init(n, eigen_value);
+    vec_init(n, lw);
+
     /**************************************ファイル名の取得***************************************/
     ifstream set_file(filename);
     if (!(set_file))
@@ -44,19 +48,20 @@ int main()
     int file_line_count = 0;
     string filename_tmp;
     string SampleFile_name, OutputFile_name;
+    string ground_state_check = "ground_state_check.txt";
     while (!set_file.eof())
     {
         getline(set_file, filename_tmp);
         if (file_line_count == 0)
         {
             SampleFile_name = filename_tmp;
-            cout << "Sample file name :" << SampleFile_name << endl;
+            // cout << "Sample file name :" << SampleFile_name << endl;
             file_line_count += 1;
         }
-        else
+        else if (file_line_count == 1)
         {
             OutputFile_name = filename_tmp;
-            cout << "Output file name :" << OutputFile_name << endl;
+            // cout << "Output file name :" << OutputFile_name << endl;
         }
     }
     set_file.close();
@@ -75,6 +80,7 @@ int main()
     printmat(n, A);
 
     ofstream output(OutputFile_name);
+    ofstream ground_state(ground_state_check);
     fprintmat(output, n, A);
 
     /*Lanczos法とLAPACKで対角化*/
@@ -82,14 +88,17 @@ int main()
 
     /*行列そのものをLAPACKに投げる*/
     LAPACKE_dsyev(LAPACK_COL_MAJOR, 'N', 'U', n, A, n, lw);
-    printf("LAPACKE's ANSWER\n");
-    printf("eigen value = \n");
-    printvec(n, lw);
+    // printf("LAPACKE's ANSWER\n");
+    // printf("eigen value = \n");
+    // printvec(n, lw);
 
     // fprintf(OutputFile_name, "LAPACKE's ANSWER\n");
 
     // fprintf(OutputFile_name, "eigen value = \n");
+    output << "LAPACKE's ANSWER\n";
+    output << "Eigen Value\n";
     fprintvec(output, n, lw);
+    output.close();
     /*メモリの開放*/
     delete[] A;
     delete[] eigen_value;

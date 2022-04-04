@@ -1,2 +1,0 @@
-sample/sample0.txt
-output/Hamiltonian_4site_Boundary.txt
