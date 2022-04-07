@@ -1,2 +1,2 @@
-sample/sample0.txt
+sample/sample2.txt
 output/output10.txt

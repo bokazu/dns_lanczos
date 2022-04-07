@@ -77,7 +77,7 @@ int main()
         num++;
     }
     sample_file.close();
-    printmat(n, A);
+    // printmat(n, A);
 
     ofstream output(OutputFile_name);
     ofstream ground_state(ground_state_check);

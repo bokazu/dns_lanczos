@@ -195,3 +195,77 @@ void fprint2dvec(ofstream &file, int n, double **C)
     file << endl;
     // fprintf(file, "]\n");
 }
+
+void print_tri_diag_vec(int n, double *alpha, double *beta)
+{
+    double dtmp, subdtmp;
+    for (int i = 0; i < n; i++)
+    {
+        for (int j = 0; j <= i - 2; j++)
+        {
+            cout << setw(7) << scientific << setprecision(3) << left << 0.0
+                 << "  ";
+        }
+        if (i == 0)
+        {
+            cout << setw(7) << scientific << setprecision(3) << left << alpha[i]
+                 << "  " << beta[i] << "  ";
+        }
+        else if (i == n - 1)
+        {
+            cout << setw(7) << scientific << setprecision(3) << left << beta[i]
+                 << "  " << alpha[i] << "  ";
+        }
+        else
+        {
+            cout << setw(7) << scientific << setprecision(3) << left << beta[i]
+                 << "  " << alpha[i] << "  " << beta[i] << "  ";
+        }
+        for (int k = i + 2; k < n; k++)
+        {
+            if (k > 0)
+            {
+                cout << setw(7) << scientific << setprecision(3) << left << 0.0
+                     << "  ";
+            }
+        }
+        cout << endl;
+    }
+}
+
+void fprint_tri_diag_vec(ofstream &file, int n, double *alpha, double *beta)
+{
+    double dtmp, subdtmp;
+    for (int i = 0; i < n; i++)
+    {
+        for (int j = 0; j <= i - 2; j++)
+        {
+            file << setw(7) << scientific << setprecision(3) << left << 0.0
+                 << "  ";
+        }
+        if (i == 0)
+        {
+            file << setw(7) << scientific << setprecision(3) << left << alpha[i]
+                 << "  " << beta[i] << "  ";
+        }
+        else if (i == n - 1)
+        {
+            file << setw(7) << scientific << setprecision(3) << left
+                 << beta[i - 1] << "  " << alpha[i] << "  ";
+        }
+        else
+        {
+            file << setw(7) << scientific << setprecision(3) << left
+                 << beta[i - 1] << "  " << alpha[i] << "  " << beta[i] << "  ";
+        }
+        for (int k = i + 2; k < n; k++)
+        {
+            if (k > 0)
+            {
+                file << setw(7) << scientific << setprecision(3) << left << 0.0
+                     << "  ";
+            }
+        }
+        file << endl;
+    }
+}

@@ -74,6 +74,9 @@ void fprintvec(std::ofstream& file, int n, double* B);
 void fprintvec_col(std::ofstream& file, int n, double* B);
 void print2dvec(int n, double** C);
 void fprint2dvec(std::ofstream& file, int n, double** C);
+void print_tri_diag_vec(int n, double* alpha, double* beta);
+void fprint_tri_diag_vec(std::ofstream& file, int n, double* alpha,
+                         double* beta);
 void calc_ab(std::ofstream& file, int n, double* A, double* eigenv);
 void gso(int n, int k, double** u);
 void sdz(int n, double* v);

@@ -7,7 +7,7 @@ lapack_int LAPACKE_dstev(int matrix_order, char jobz, lapack_int n, double *d,
 
 void calc_ab(ofstream &file, int n, double *A, double *eigen_value)
 {
-    cout << "start function_v2\n";
+    std::cout << "start function_v2\n";
     // setting Initial vector & standarbilization
     double **u = new double *[n];
     for (int i = 0; i < n; i++)
@@ -24,11 +24,17 @@ void calc_ab(ofstream &file, int n, double *A, double *eigen_value)
         }
     }
 
+    /*初期ベクトルの決定*/
+    random_device rnd;
+    mt19937 mt(rnd());  //メルセンヌ・ツイスタを利用
+    uniform_real_distribution<> rand01(0, 1);
     for (int i = 0; i < n; i++)
     {
-        u[0][i] = (double)rand() / RAND_MAX;
+        u[0][i] = rand01(mt);
     }
     sdz(n, u[0]);
+    file << "u[0] = " << endl;
+    fprintvec(file, n, u[0]);
 
     double *v = new double[n];
     vec_init(n, v);
@@ -36,8 +42,8 @@ void calc_ab(ofstream &file, int n, double *A, double *eigen_value)
         new double[n];  // Insert diagonal elements of tridiagonal matrix
     vec_init(n, alpha);
     double *beta =
-        new double[n];  // Insert subdiagonal elements of tridiagonal matrix
-    vec_init(n, beta);
+        new double[n - 1];  // Insert subdiagonal elements of tridiagonal matrix
+    vec_init(n - 1, beta);
     // Insert eigenvalue when k == even & odd
     double *eigenv_even = new double[n];
     vec_init(n, eigenv_even);
@@ -51,8 +57,8 @@ void calc_ab(ofstream &file, int n, double *A, double *eigen_value)
     // Use as lapack argument. d = alpha, e = beta
     double *d = new double[n];
     vec_init(n, d);
-    double *e = new double[n];
-    vec_init(n, e);
+    double *e = new double[n - 1];
+    vec_init(n - 1, e);
 
     double beta_pow2 = 0.;
     double eps = 1.0;
@@ -62,6 +68,9 @@ void calc_ab(ofstream &file, int n, double *A, double *eigen_value)
 
     for (int k = 0; k < n; k++)
     {
+        if (k > 0) count++;
+        vec_init(n, v);
+        file << "loop count = " << k << endl;
         if (checker)
         {
             if (k == n - 1)
@@ -69,23 +78,37 @@ void calc_ab(ofstream &file, int n, double *A, double *eigen_value)
                 // calculate v[i] = Au0(k)
                 cblas_dgemv(CblasRowMajor, CblasNoTrans, n, n, 1.0, A, n, u[k],
                             1, 0.0, v, 1);
+                file << "\n"
+                     << "v = Au = " << endl;
+                fprintvec(file, n, v);
                 // calculate alpha & beta
                 alpha[k] = cblas_ddot(n, v, 1, u[k], 1);
+                file << "\n"
+                     << "tri_diag_matrix = " << endl;
+                fprint_tri_diag_vec(file, n, alpha, beta);
             }
             else
             {
                 // calculate v[i] = Au0(k)
                 cblas_dgemv(CblasRowMajor, CblasNoTrans, n, n, 1.0, A, n, u[k],
                             1, 0.0, v, 1);
+                file << "v = Au = " << endl;
+                fprintvec(file, n, v);
                 if (k == 0)
                 {
                     alpha[k] = cblas_ddot(n, v, 1, u[k], 1);
                     cblas_daxpy(n, -alpha[k], u[k], 1, v, 1);
                     beta[k] = cblas_dnrm2(n, v, 1);
+                    file << "\n"
+                         << "tri_diag_matrix = " << endl;
+                    fprint_tri_diag_vec(file, n, alpha, beta);
                     cblas_dscal(n, 1 / beta[k], v, 1);
                     cblas_dcopy(n, v, 1, u[k + 1], 1);
                     gso(n, k, u);
                     sdz(n, u[k + 1]);
+                    file << "\n"
+                         << "u[k+1] = " << endl;
+                    fprintvec(file, n, u[k + 1]);
                 }
                 else
                 {
@@ -93,17 +116,23 @@ void calc_ab(ofstream &file, int n, double *A, double *eigen_value)
                     cblas_daxpy(n, -beta[k - 1], u[k - 1], 1, v, 1);
                     cblas_daxpy(n, -alpha[k], u[k], 1, v, 1);
                     beta[k] = cblas_dnrm2(n, v, 1);
-                    cblas_dscal(n, 1 / beta[k], v, 1);
+                    file << "\n"
+                         << "tri_diag_matrix = " << endl;
+                    fprint_tri_diag_vec(file, n, alpha, beta);
+                    cblas_dscal(n, 1.0 / beta[k], v, 1);
                     cblas_dcopy(n, v, 1, u[k + 1], 1);
                     gso(n, k, u);
                     sdz(n, u[k + 1]);
+                    file << "\n"
+                         << "u[k+1] = " << endl;
+                    fprintvec(file, n, u[k + 1]);
                 }
             }
 
             // calculate eigenvalue of A(k)
 
             cblas_dcopy(n, alpha, 1, d, 1);
-            cblas_dcopy(n, beta, 1, e, 1);
+            cblas_dcopy(n - 1, beta, 1, e, 1);
             if (k % 2 == 0)
             {
                 if (k == n - 1)
@@ -139,7 +168,7 @@ void calc_ab(ofstream &file, int n, double *A, double *eigen_value)
             if (k > 0)
             {
                 eps = abs(eigenv_even[0] - eigenv_odd[0]);
-                if (eps > 1.0e-16)
+                if (eps > 1.0e-15)
                 {
                     checker = true;
                 }
@@ -153,15 +182,14 @@ void calc_ab(ofstream &file, int n, double *A, double *eigen_value)
         }
         else
         {
-            // cout << "break at" << k << endl;
+            cout << "break at" << k << endl;
             break;
         }
-        count++;
     }
     if (count % 2 == 0)
-        cblas_dcopy(n, eigenv_odd, 1, eigen_value, 1);
-    else
         cblas_dcopy(n, eigenv_even, 1, eigen_value, 1);
+    else
+        cblas_dcopy(n, eigenv_odd, 1, eigen_value, 1);
     // printf("my eigen value = \n");
     printvec(n, eigen_value);
     // fprintf(file, "\n");
@@ -179,7 +207,7 @@ void calc_ab(ofstream &file, int n, double *A, double *eigen_value)
 
     fprintvec_col(file, n, eigen_value);
 
-    cout << "end\n";
+    std::cout << "end\n";
     for (int i = 0; i < n; i++)
     {
         delete u[i];

@@ -1,4 +1,4 @@
-gcc_options = -std=c++17 -Wall --pedantic-errors
+gcc_options = -std=c++17 -Wall --pedantic-errors -g
 l_b = -llapacke -lblas
 
 program : main.o printmat.o function_v2.o gso.o
